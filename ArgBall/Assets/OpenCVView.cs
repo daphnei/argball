@@ -8,148 +8,115 @@ using OpenCvSharp.CPlusPlus;
 
 public class OpenCVView : MonoBehaviour {
 
-	public GameObject planeObj;
-	public WebCamTexture webcamTexture;
-	public Texture2D texImage;
-	public string deviceName;
-	private int devId = 1;
-	private int imWidth = 640;
-	private int imHeight = 480;
-	private string errorMsg = "No errors found!";
+	private const int WEB_WIDTH = 320;
+	private const int WEB_HEIGHT = 240;
 
-	static IplImage matrix;
-	byte[] data;
+	public GameObject outputPlane;
+	public WebCamTexture webcamTexture;
+	public Texture2D outputPlaneImage;
+	public string deviceName;
+
+	private int cameraId = 1;
+	private string errorMessage = "No errors found!";
+	private Color32[] colorBuffer = new Color32[WEB_WIDTH * WEB_HEIGHT];
+
+	private static IplImage ImageBuffer;
+
 
 	// Use this for initialization
 	void Start() {
-		WebCamDevice[] devices = WebCamTexture.devices;
-		Debug.Log("num:" + devices.Length);
 
+		// Find a webcam device.
+		WebCamDevice[] devices = WebCamTexture.devices;
 		for (int i = 0; i < devices.Length; i++) {
-			print(devices[i].name);
 			if (devices[i].name.CompareTo(deviceName) == 1) {
-				devId = i;
+				this.cameraId = i;
 			}
 		}
 
-		if (devId >= 0) {
-			planeObj = GameObject.Find("Plane");
-			texImage = new Texture2D(imWidth, imHeight, TextureFormat.RGB24, false);
-			webcamTexture = new WebCamTexture(devices[devId].name, imWidth, imHeight, 60);
-			webcamTexture.Play();
-			data = new byte[imWidth * imHeight * 3];
-			matrix = new IplImage(imWidth, imHeight, BitDepth.U8, 4);
+		// Setup the webcam.
+		if (this.cameraId >= 0) {
+			this.outputPlane = GameObject.Find("Plane");
+			this.outputPlaneImage = new Texture2D(WEB_WIDTH, WEB_HEIGHT, TextureFormat.RGB24, false);
+
+			this.webcamTexture = new WebCamTexture(devices[this.cameraId].name, WEB_WIDTH, WEB_HEIGHT, 60);
+			this.webcamTexture.Play();
+			this.outputPlane.renderer.material.mainTexture = this.webcamTexture;
+
+			ImageBuffer = new IplImage(WEB_WIDTH, WEB_HEIGHT, BitDepth.U8, 4);			
 		}
 	}
-
+	
 	void Update() {
-		if (devId >= 0) {
-
-			Texture2DtoIplImage();
+		Debug.Log("DFG");
+		if (this.cameraId >= 0) {
+			Debug.Log("DFG2");
+			CopyWebcamToIplImage(ImageBuffer);
 
 			CvFont font = new CvFont(FontFace.Vector0, 1.0, 1.0);
 			CvColor rcolor = CvColor.Random();
-			Cv.PutText(matrix, "Snapshot taken!", new CvPoint(15, 30), font, rcolor);
+			Cv.PutText(ImageBuffer, "Snapshot taken!", new CvPoint(15, 30), font, rcolor);
 
-			IplImage cny = new IplImage(imWidth, imHeight, BitDepth.U8, 1);
-			matrix.CvtColor(cny, ColorConversion.RgbToGray);
+			IplImage cny = new IplImage(WEB_WIDTH, WEB_HEIGHT, BitDepth.U8, 1);
+			ImageBuffer.CvtColor(cny, ColorConversion.RgbToGray);
 
 			Cv.Canny(cny, cny, 50, 50, ApertureSize.Size3);
-			Cv.CvtColor(cny, matrix, ColorConversion.GrayToBgr);
+			Cv.CvtColor(cny, ImageBuffer, ColorConversion.GrayToBgr);
 
+			CvCircleSegment[] circles = Cv2.HoughCircles(InputArray.Create(new Mat(cny)), HoughCirclesMethod.Gradient, 1.0, 1.0);
+
+			this.errorMessage = "circles " + circles.Length;
+
+			/* SIFT sift = new SIFT();
+			KeyPoint[] keypoints1;
+			MatOfFloat descriptors1 = new MatOfFloat();
+			sift.Run(new Mat(matrix), null, out keypoints1, descriptors1); */
+
+			// For debugging purposes, 
 			if (webcamTexture.didUpdateThisFrame) {
-				//IplImageToTexture2D();
+				PushIplImageToOutputPlane();
 			}
-
-			//SIFT sift = new SIFT();
-			//KeyPoint[] keypoints1, keypoints2;
-			//MatOfFloat descriptors1 = new MatOfFloat();
-			//sift.Run(matrix, null, out keypoints1, descriptors1);
-
-			//VideoCapture vc = new VideoCapture()
-
 		} else {
 			Debug.Log("Can't find camera!");
 		}
 	}
 
 	void OnGUI() {
-		GUI.Label(new UnityEngine.Rect(200, 200, 100, 90), errorMsg);
+		GUI.Label(new UnityEngine.Rect(200, 200, 100, 90), this.errorMessage);
 	}
 
+	void PushIplImageToOutputPlane() {
+		int jBackwards = WEB_HEIGHT;
 
-	void IplImageToTexture2D() {
-		int jBackwards = imHeight;
-
-		for (int i = 0; i < imHeight; i++) {
-			for (int j = 0; j < imWidth; j++) {
-				float r = (float)matrix[i, j].Val0;
-				float g = (float)matrix[i, j].Val1;
-				float b = (float)matrix[i, j].Val2;
+		for (int i = 0; i < WEB_HEIGHT; i++) {
+			for (int j = 0; j < WEB_WIDTH; j++) {
+				float r = (float)ImageBuffer[i, j].Val0;
+				float g = (float)ImageBuffer[i, j].Val1;
+				float b = (float)ImageBuffer[i, j].Val2;
 				Color color = new Color(r / 255.0f, g / 255.0f, b / 255.0f);
 
 
-				jBackwards = imHeight - i - 1; // notice it is jBackward and i
-				texImage.SetPixel(j, jBackwards, color);
+				jBackwards = WEB_HEIGHT - i - 1; // notice it is jBackward and i
+				outputPlaneImage.SetPixel(j, jBackwards, color);
 			}
 		}
 		
-		//Debug.Log(matrix.ToString());
-		//texImage.LoadImage(matrix.(".png"));
-		//matrix.ToBytes(".png");
-		//Marshal.Copy(, 0, texImage.GetNativeTexturePtr(), 640 * 480 * 4);
+		// Debug.Log(matrix.ToString());
+		// texImage.LoadImage(matrix.(".png"));
+		// matrix.ToBytes(".png");
+		// Marshal.Copy(, 0, texImage.GetNativeTexturePtr(), 640 * 480 * 4);
 
-		
-
-		texImage.Apply();
-		planeObj.renderer.material.mainTexture = texImage;
-
+		outputPlaneImage.Apply();
+		outputPlane.renderer.material.mainTexture = outputPlaneImage;
 	}
 
-	Color32[] colors = new Color32[640 * 480];
-
-	void Texture2DtoIplImage() {
-		int jBackwards = imHeight;
-
-		/*for (int v = 0; v < imHeight; ++v) {
-			for (int u = 0; u < imWidth; ++u) {
-
-				CvScalar col = new CvScalar();
-				col.Val0 = (double)webcamTexture.GetPixel(u, v).b * 255;
-				col.Val1 = (double)webcamTexture.GetPixel(u, v).g * 255;
-				col.Val2 = (double)webcamTexture.GetPixel(u, v).r * 255;
-
-				jBackwards = imHeight - v - 1;
-
-				matrix.Set2D(jBackwards, u, col);
-				matrix.se
-				//matrix [jBackwards, u] = col;
-			}
-		}*/
-
-		this.webcamTexture.GetPixels32(colors);
-		byte[] bytes = Color32ArrayToByteArray(colors); // OPTIMIZE
-		Marshal.Copy(bytes, 0, matrix.ImageData, 640 * 480 * 4);
-
-		/*IntPtr ptr = matrix.ImageData;
-		for (int x = 0; x < imWidth; x++) {
-			for (int y = 0; y < imHeight; y++) {
-				int offset = (image.WidthStep * y) + (x * 3);
-				byte b = Marshal.ReadByte(ptr, offset + 0);    // B
-				byte g = Marshal.ReadByte(ptr, offset + 1);    // G
-				byte r = Marshal.ReadByte(ptr, offset + 2);    // R
-				Marshal.WriteByte(ptr, offset, r);
-				Marshal.WriteByte(ptr, offset, g);
-				Marshal.WriteByte(ptr, offset, b);
-			}
-		}
-
-
-		Marshal.Copy(this.webcamTexture.GetNativeTexturePtr, matrix., 0, 640 * 480 * 3);*/
-		//Cv.SaveImage ("C:\\Hasan.jpg", matrix);
+	private void CopyWebcamToIplImage(IplImage image) {
+		this.webcamTexture.GetPixels32(colorBuffer);
+		byte[] bytes = ConvertColor32ArrayToByteArray(colorBuffer); // TODO: Can be optimized?
+		Marshal.Copy(bytes, 0, image.ImageData, WEB_WIDTH * WEB_HEIGHT * 4);
 	}
 
-	private static byte[] Color32ArrayToByteArray(Color32[] colors) {
+	private static byte[] ConvertColor32ArrayToByteArray(Color32[] colors) {
 		if (colors == null || colors.Length == 0)
 			return null;
 
