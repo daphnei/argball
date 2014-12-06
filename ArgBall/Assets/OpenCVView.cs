@@ -74,7 +74,7 @@ public class OpenCVView : MonoBehaviour {
 
 			// For debugging purposes, 
 			if (webcamTexture.didUpdateThisFrame) {
-				PushIplImageToOutputPlane();
+				//this.PushIplImageToOutputPlane();
 			}
 		} else {
 			Debug.Log("Can't find camera!");

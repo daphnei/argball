@@ -50,6 +50,9 @@
      <Compile Include="Assets\OpenCVCapture.cs" />
      <Compile Include="Assets\OpenCVView.cs" />
      <Compile Include="Assets\WebCamView.cs" />
+ <Reference Include="OpenCvSharp.Blob">
+ <HintPath>Assets\Plugins\OpenCvSharp.Blob.dll</HintPath>
+ </Reference>
  <Reference Include="OpenCvSharp.CPlusPlus">
  <HintPath>Assets\Plugins\OpenCvSharp.CPlusPlus.dll</HintPath>
  </Reference>
