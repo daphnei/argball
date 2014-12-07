@@ -15,7 +15,7 @@ public class ThrowBall : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		TestMathSupport.TestHomography();
 	}
 
 	// Update is called once per frame
