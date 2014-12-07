@@ -63,6 +63,7 @@
      <Compile Include="Assets\Common\UIFramework\SceneViewManager.cs" />
      <Compile Include="Assets\Common\UIFramework\SplashScreenView.cs" />
      <Compile Include="Assets\Custom\CameraPoint.cs" />
+     <Compile Include="Assets\Custom\CustomCamera.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Collection.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Combinatorics.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Complex.cs" />
