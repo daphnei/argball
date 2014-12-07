@@ -2,8 +2,17 @@
 using System.Collections;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using System;
 
-public class MathSupport {
+public static class MathSupport {
+
+	public static Vector3 ConvertVectorToVector3(this Vector vector) {
+		if (vector.Length != 3) {
+			throw new Exception("You suck.");
+		}
+		return new Vector3((float)vector[0], (float)vector[1], (float)vector[2]);
+	}
+
 	public static Matrix ComputeHomography(Vector2[] first, Vector2[] second) {
 		int n = first.Length;
 		if (n != second.Length) {
