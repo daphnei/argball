@@ -31,6 +31,11 @@ public class CustomCamera : MonoBehaviour {
 		float norm2 = (float)homography.GetColumnVector(1).Norm();
 		float tnorm = (norm1 + norm2) / 2;
 		pose.SetColumnVector(homography.GetColumnVector(2) / tnorm, 3);
-		this.transform.position = pose.GetColumnVector(2).ConvertVectorToVector3();
+
+		Matrix camRotation = pose.GetMatrix(0, 2, 0, 2);
+		Vector camTranslation = pose.GetColumnVector(3);
+		
+		Matrix actualTranslation = -1 * Matrix.Transpose(camRotation) * camTranslation.ToColumnMatrix();
+		this.transform.position = actualTranslation.GetColumnVector(0).ToVector3();
 	}
 }

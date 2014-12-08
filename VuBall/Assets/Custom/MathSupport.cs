@@ -6,7 +6,15 @@ using System;
 
 public static class MathSupport {
 
-	public static Vector3 ConvertVectorToVector3(this Vector vector) {
+	public static Vector ToHomogeneousVector(this Vector2 vector) {
+		Vector v = new Vector(3);
+		v[0] = vector.x;
+		v[1] = vector.y;
+		v[2] = 1;
+		return v;
+	}	
+
+	public static Vector3 ToVector3(this Vector vector) {
 		if (vector.Length != 3) {
 			throw new Exception("You suck.");
 		}
@@ -49,7 +57,7 @@ public static class MathSupport {
 			b[i2, 0] = second[i].y;
 		}
 
-		Matrix x = a.QRDecomposition.Solve(b);
+		Matrix x = a.Solve(b);
 		Matrix result = new Matrix(3, 3);
 		result[0, 0] = x[0, 0];
 		result[0, 1] = x[1, 0];

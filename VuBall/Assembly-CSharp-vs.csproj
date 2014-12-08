@@ -166,6 +166,7 @@
      <Compile Include="Assets\Custom\IridiumMathLibrary\Trigonometry.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Tuple.cs" />
      <Compile Include="Assets\Custom\MathSupport.cs" />
+     <Compile Include="Assets\Custom\TestMathSupport.cs" />
      <Compile Include="Assets\Custom\ThrowBall.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\CloudRecoBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\CylinderTargetBehaviour.cs" />
