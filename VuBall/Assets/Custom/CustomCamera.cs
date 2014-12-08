@@ -36,6 +36,7 @@ public class CustomCamera : MonoBehaviour {
 		Vector camTranslation = pose.GetColumnVector(3);
 		
 		Matrix actualTranslation = -1 * Matrix.Transpose(camRotation) * camTranslation.ToColumnMatrix();
-		this.transform.position = actualTranslation.GetColumnVector(0).ToVector3();
+		this.transform.localPosition = actualTranslation.GetColumnVector(0).ToVector3();
+		this.transform.localRotation = MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
 	}
 }
