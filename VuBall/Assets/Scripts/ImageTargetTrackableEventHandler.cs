@@ -79,7 +79,7 @@ public class ImageTargetTrackableEventHandler : MonoBehaviour,
     private void OnTrackingLost()
     {
         isBeingTracked = false;
-        Renderer[] rendererComponents = GetComponentsInChildren<Renderer>(true);
+        /* Renderer[] rendererComponents = GetComponentsInChildren<Renderer>(true);
         Collider[] colliderComponents = GetComponentsInChildren<Collider>(true);
 
         // Disable rendering:
@@ -94,7 +94,7 @@ public class ImageTargetTrackableEventHandler : MonoBehaviour,
             component.enabled = false;
         }
 
-        Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
+        Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost"); */
     }
 
     #endregion // PRIVATE_METHODS

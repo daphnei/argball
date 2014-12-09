@@ -4,25 +4,68 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 
 public class CustomCamera : MonoBehaviour {
 
+	public static bool CustomPlacement = false;
+	public static bool CustomDebug = true;
+
 	public Camera arCamera;
 	public GameObject[] trackers;
 	public Vector2[] points;
+	public ImageTargetTrackableEventHandler trackedPlane;
 
-	public float focalLength = 482.0234f;
-	public Vector2 cameraCenter = new Vector2(225.0186f, 140.0390f);
+	public float focalLength = 1;
+	public Vector2 cameraCenter = new Vector2(0, 0);
+
+	const int history = 8;
+	
+	private Vector3 prevChangePos = Vector3.zero;
+	private Quaternion prevChangeRot = Quaternion.identity;
+	private Vector3 prevPos = Vector3.zero;
+	private Quaternion prevRot = Quaternion.identity;
 
 	// Update is called once per frame
 	void Update () {
+		this.camera.projectionMatrix = this.arCamera.projectionMatrix;
+
+		Vector3 newPosition;
+		Quaternion newRotation;
+		if (CustomCamera.CustomPlacement) {
+			this.PlaceCameraBasedOnHomography(out newPosition, out newRotation);
+		} else {
+			this.PlaceCameraBasedOnCheating(out newPosition, out newRotation);
+		}
+
+		if (trackedPlane.isBeingTracked) {
+			if (prevPos != newPosition || prevRot != newRotation) {
+				this.prevChangePos = newPosition - prevPos;
+				this.prevChangeRot = newRotation * Quaternion.Inverse(prevRot);
+			}
+
+			this.transform.position = Vector3.Lerp(newPosition, this.transform.position, 0.5f);
+			this.transform.rotation = Quaternion.Lerp(newRotation, this.transform.rotation, 0.5f);
+		} else {
+			this.transform.position += this.prevChangePos;
+			this.transform.rotation *= this.prevChangeRot;
+		}
+
+		this.prevPos = newPosition;
+		this.prevRot = newRotation;
+	}
+
+	/// <summary>
+	/// Places this camera based on the input points from the other camera.
+	/// </summary>
+	void PlaceCameraBasedOnHomography(out Vector3 position, out Quaternion rotation) {
 		Vector2[] screenPoints = trackers.Select(obj => {
 			Vector3 screen = this.arCamera.WorldToScreenPoint(obj.transform.position);
 			return new Vector2(screen.x, screen.y);
 		}).ToArray();
 
-		Matrix homography = MathSupport.ComputeHomography(screenPoints, points);		
+		Matrix homography = MathSupport.ComputeHomography(screenPoints, points);
 		Matrix pose = Matrix.Identity(3, 4);
 
 		// Set the first two columns of the pose.
@@ -30,7 +73,7 @@ public class CustomCamera : MonoBehaviour {
 		pose.SetColumnVector(homography.GetColumnVector(1).Normalize(), 1);
 
 		// Set the third column as the cross of the first two.
-		Vector cross = pose.GetColumnVector(0).CrossMultiply(pose.GetColumnVector(1));
+		Vector cross = pose.GetColumnVector(0).CrossMultiply(pose.GetColumnVector(1)).Normalize();
 		pose.SetColumnVector(cross, 2);
 
 		// Set the forth column of the pose matrix.
@@ -50,15 +93,19 @@ public class CustomCamera : MonoBehaviour {
 		Matrix extrinsics = intrinsics.Inverse() * pose;
 
 		Matrix camRotation = extrinsics.GetMatrix(0, 2, 0, 2);
-		Vector camTranslation = extrinsics.GetColumnVector(3);
+		camRotation.Inverse();
+		Matrix camTranslation = extrinsics.GetColumnVector(3).ToColumnMatrix();
+		camTranslation = -1 * camRotation * camTranslation;
 
-		Matrix actualTranslation = -1 * Matrix.Transpose(camRotation) * camTranslation.ToColumnMatrix();
-		this.transform.localPosition = actualTranslation.GetColumnVector(0).ToVector3();
-		this.transform.localRotation = MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
-		this.camera.projectionMatrix = this.arCamera.projectionMatrix;
+		position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
+		rotation = this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
 
-		float focalLength = 0.5f * this.arCamera.pixelHeight / ((float)Math.Tan(Mathf.Deg2Rad * this.arCamera.fieldOfView / 2));
-		Debug.Log(this.camera.projectionMatrix + "FOCAL" + focalLength);
-		Debug.Log(CameraDevice.Instance.ToString());
+		// ATTEMPT AT CALCULATING THE FOCAL LENGTH
+		// float focalLength = 0.5f * this.arCamera.pixelHeight / ((float)Math.Tan(Mathf.Deg2Rad * this.arCamera.fieldOfView / 2));
+	}
+
+	void PlaceCameraBasedOnCheating(out Vector3 position, out Quaternion rotation) {		
+		position = this.arCamera.transform.position;
+		rotation = this.arCamera.transform.rotation;
 	}
 }

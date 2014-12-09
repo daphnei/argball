@@ -19,15 +19,5 @@ public static class TestMathSupport {
 			transformed = transformed * (1/transformed[2, 0]);
 			Debug.Log(transformed.ToString() + " == " + outputVector.ToString()); 
 		}
-
-		/*   -0.4846    0.4487    0.0072
-  			 -0.5349    0.5247    0.0072
-  			 -0.0395    0.0236    0.0144 */
-
-		//And flipped
-		/*    -0.3289    0.2802    0.0244
-  			 -0.3304    0.2981    0.0161
-  			 -0.3612    0.2802    0.6368
-   */
 	}
 }

@@ -3,18 +3,13 @@ using System.Collections;
 
 public class CameraPoint : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	public Camera attachedCamera;
 
 	void OnGUI() {
-		Vector3 screenPos = Camera.main.WorldToScreenPoint(this.transform.position);
-		GUI.Label(new Rect(screenPos.x, Screen.height-screenPos.y, 100, 100), "P");
+		if (CustomCamera.CustomDebug) {
+			Vector3 screenPos = this.attachedCamera.WorldToScreenPoint(this.transform.position);
+			GUI.color = Color.red;
+			GUI.Label(new Rect(screenPos.x - 5, Screen.height - screenPos.y - 5, 40, 40), "O");
+		}
 	}
 }

@@ -64,6 +64,7 @@
      <Compile Include="Assets\Common\UIFramework\SplashScreenView.cs" />
      <Compile Include="Assets\Custom\CameraPoint.cs" />
      <Compile Include="Assets\Custom\CustomCamera.cs" />
+     <Compile Include="Assets\Custom\DebugMarker.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Collection.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Combinatorics.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Complex.cs" />
@@ -205,6 +206,7 @@
      <None Include="Assets\Qualcomm Augmented Reality\license_3rdpartynotice.txt" />
      <None Include="Assets\Qualcomm Augmented Reality\Shaders\RenderVideoBackground.shader" />
      <None Include="Assets\Qualcomm Augmented Reality\readme_SDK.txt" />
+     <None Include="Assets\Custom\TransparentShadowReceiver.shader" />
      <None Include="Assets\StreamingAssets\QCAR\StonesAndChips.xml" />
      <None Include="Assets\Editor\QCAR\WebcamProfiles\profiles.xml" />
      <None Include="Assets\Qualcomm Augmented Reality\Shaders\DepthMask.shader" />
