@@ -8,8 +8,8 @@ public class ThrowBall : MonoBehaviour {
 
 	public Camera throwCamera;
 
-	float speed = 256;
-	float spawnDistance = 50;
+	public float speed = 256;
+	public float spawnDistance = 50;
 
 	// Use this for initialization
 	void Start () {
@@ -22,5 +22,9 @@ public class ThrowBall : MonoBehaviour {
 			this.transform.position = throwCamera.transform.position + throwCamera.transform.forward * spawnDistance;
 			this.rigidbody.velocity = throwCamera.transform.forward * speed;
 		}
+	}
+
+	void OnCollisionEnter() {
+		Debug.Log("SDF");
 	}
 }

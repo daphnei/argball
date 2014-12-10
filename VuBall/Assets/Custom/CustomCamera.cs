@@ -17,18 +17,27 @@ public class CustomCamera : MonoBehaviour {
 	public Vector2[] points;
 	public ImageTargetTrackableEventHandler trackedPlane;
 
+	public bool mobilePhoneCanvasHack = true;
+	public GameObject webcamPlane;
+	public float backgroundScale = 0.0081f;
+	public float backgroundDistance = 2000f;
+
 	public float focalLength = 1;
 	public Vector2 cameraCenter = new Vector2(0, 0);
-
-	const int history = 8;
 	
 	private Vector3 prevChangePos = Vector3.zero;
 	private Quaternion prevChangeRot = Quaternion.identity;
 	private Vector3 prevPos = Vector3.zero;
 	private Quaternion prevRot = Quaternion.identity;
+	private GameObject originalWebcamPlane;
+
+	void Start() {
+		this.originalWebcamPlane = GameObject.Find("BackgroundCamera(Clone)").GetComponentInChildren(typeof(BGRenderingBehaviour)).gameObject;
+	}
 
 	// Update is called once per frame
 	void Update () {
+		this.arCamera.clearFlags = CameraClearFlags.SolidColor;
 		this.camera.projectionMatrix = this.arCamera.projectionMatrix;
 
 		Vector3 newPosition;
@@ -42,18 +51,31 @@ public class CustomCamera : MonoBehaviour {
 		if (trackedPlane.isBeingTracked) {
 			if (prevPos != newPosition || prevRot != newRotation) {
 				this.prevChangePos = newPosition - prevPos;
-				this.prevChangeRot = newRotation * Quaternion.Inverse(prevRot);
+				this.prevChangeRot = Quaternion.Lerp(newRotation * Quaternion.Inverse(prevRot), Quaternion.identity, 0.2f);
 			}
 
 			this.transform.position = Vector3.Lerp(newPosition, this.transform.position, 0.5f);
 			this.transform.rotation = Quaternion.Lerp(newRotation, this.transform.rotation, 0.5f);
 		} else {
 			this.transform.position += this.prevChangePos;
-			this.transform.rotation *= this.prevChangeRot;
+			//this.transform.rotation *= this.prevChangeRot;
+			this.prevChangePos *= 0.5f;
+			this.prevChangeRot = Quaternion.Lerp(this.prevChangeRot, Quaternion.identity, 0.2f);
 		}
 
 		this.prevPos = newPosition;
 		this.prevRot = newRotation;
+
+		if (this.mobilePhoneCanvasHack) {
+			this.webcamPlane.SetActive(true);
+			float distance = this.backgroundDistance;
+			this.webcamPlane.transform.position = this.camera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, distance));
+			float scaleDistance = (this.webcamPlane.transform.position - this.camera.ViewportToWorldPoint(new Vector3(1, 0.5f, distance))).magnitude;
+			this.webcamPlane.transform.localScale = new Vector3(scaleDistance * backgroundScale, scaleDistance * backgroundScale * 0.7f, 1);
+			this.webcamPlane.renderer.material.SetTexture("_MainTex", originalWebcamPlane.renderer.material.GetTexture("_MainTex"));
+		} else {
+			this.webcamPlane.SetActive(false);
+		}
 	}
 
 	/// <summary>

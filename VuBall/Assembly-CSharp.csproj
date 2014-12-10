@@ -167,6 +167,7 @@
      <Compile Include="Assets\Custom\IridiumMathLibrary\Trigonometry.cs" />
      <Compile Include="Assets\Custom\IridiumMathLibrary\Tuple.cs" />
      <Compile Include="Assets\Custom\MathSupport.cs" />
+     <Compile Include="Assets\Custom\Paddle.cs" />
      <Compile Include="Assets\Custom\TestMathSupport.cs" />
      <Compile Include="Assets\Custom\ThrowBall.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\CloudRecoBehaviour.cs" />
@@ -186,7 +187,6 @@
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\MaskOutBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\MultiTargetBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\PropBehaviour.cs" />
-     <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\QCARBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\SetBGCameraLayerBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\SmartTerrainBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\SurfaceBehaviour.cs" />
@@ -211,6 +211,7 @@
      <None Include="Assets\Editor\QCAR\WebcamProfiles\profiles.xml" />
      <None Include="Assets\Qualcomm Augmented Reality\Shaders\DepthMask.shader" />
      <None Include="Assets\StreamingAssets\QCAR\Tarmac.xml" />
+     <None Include="Assets\Custom\MatteShadow.shader" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Qualcomm Augmented Reality\Shaders\BrightTexture.shader" />
      <None Include="Assets\Resources\Vuforia_About.txt" />
