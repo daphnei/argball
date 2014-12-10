@@ -39,7 +39,6 @@ public class CustomCamera : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		this.arCamera.clearFlags = CameraClearFlags.SolidColor;
 		this.camera.projectionMatrix = this.arCamera.projectionMatrix;
 
 		Vector3 newPosition;
