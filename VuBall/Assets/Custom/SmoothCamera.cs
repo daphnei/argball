@@ -57,5 +57,4 @@ public class SmoothCamera : MonoBehaviour, ITrackerEventHandler {
 		transform.rotation = smoothedRotation;
 		transform.position = smoothedPosition;
 	}
-
 }
