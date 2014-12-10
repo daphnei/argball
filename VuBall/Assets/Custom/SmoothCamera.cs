@@ -12,8 +12,8 @@ public class SmoothCamera : MonoBehaviour, ITrackerEventHandler {
 	public int smoothingFrames = 10;
 	private QCARBehaviour qcarBehavior;
 
-	private Quaternion smoothedRotation;
-	private Vector3 smoothedPosition;
+	public Quaternion smoothedRotation;
+	public Vector3 smoothedPosition;
 
 	private Queue<Quaternion> rotations;
 	private Queue<Vector3> positions;

@@ -21,13 +21,21 @@ public class Paddle : MonoBehaviour {
 	
 	void Update () {
 		Vector3 destination = this.followCamera.transform.position + this.followCamera.transform.forward * this.forwardDistance;
-
+		SmoothCamera smooth = this.followCamera.GetComponent<SmoothCamera>();
+		Quaternion rotation = this.followCamera.transform.rotation;
+		if (smooth != null) {
+			destination = smooth.smoothedPosition;
+			this.transform.rotation = smooth.smoothedRotation;
+			destination += this.transform.forward * this.forwardDistance;
+			rotation = smooth.smoothedRotation;
+		}
+		
 		if (savedRotations.Count >= smoothingFrames) {
 			savedRotations.Dequeue();
 			savedPositions.Dequeue();
 		}
 
-		savedRotations.Enqueue(followCamera.transform.rotation);
+		savedRotations.Enqueue(rotation);
 		savedPositions.Enqueue(destination);
 
 		Vector4 avgr = Vector4.zero;
