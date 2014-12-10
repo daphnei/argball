@@ -21,6 +21,8 @@ public class CustomCamera : MonoBehaviour {
 	public float focalLength = 4;
 	public Vector2 cameraCenter = new Vector2(0.00373779f, -0.00377362f);
 
+	public Matrix homography;
+
 	// Update is called once per frame
 	void Update () {
 		this.camera.projectionMatrix = this.arCamera.projectionMatrix;
@@ -54,7 +56,7 @@ public class CustomCamera : MonoBehaviour {
 		intrinsics[1, 2] = this.cameraCenter.y;
 		intrinsics[2, 2] = 1;
 
-		Matrix homography = MathSupport.ComputeHomography(screenPoints, points);
+		homography = MathSupport.ComputeHomography(screenPoints, points);
 		homography = intrinsics.Inverse() * homography;
 
 		Matrix pose = Matrix.Identity(3, 4);

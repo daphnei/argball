@@ -21,6 +21,16 @@ public static class MathSupport {
 		return new Vector3((float)vector[0], (float)vector[1], (float)vector[2]);
 	}
 
+	public static Matrix4x4 ToMatrix4x4(this Matrix matirx) {
+		Matrix4x4 result = new Matrix4x4();
+		for (int r = 0; r < matirx.RowCount && r < 4; r++) {
+			for (int c = 0; c < matirx.RowCount && c < 4; c++) {
+				result[r, c] = (float)matirx[r, c];
+			}
+		}
+		return result;
+	}
+
 	/// <summary>
 	/// Code adapted from this article:
 	/// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
