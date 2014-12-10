@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class CustomCamera : MonoBehaviour {
 
-	public static bool CustomPlacement = false;
+	public static bool CustomPlacement = true;
 	public static bool CustomDebug = true;
 
 	public Camera arCamera;
@@ -22,8 +22,10 @@ public class CustomCamera : MonoBehaviour {
 	public float backgroundScale = 0.0081f;
 	public float backgroundDistance = 2000f;
 
-	public float focalLength = 1;
-	public Vector2 cameraCenter = new Vector2(0, 0);
+	//K1: 0.0312817 K2: 0.0554488 K3: 0
+	//P1: 0.00373779 P2: -0.00377362
+	public float focalLength = 4;
+	public Vector2 cameraCenter = new Vector2(0.00373779f, -0.00377362f);
 	
 	private Vector3 prevChangePos = Vector3.zero;
 	private Quaternion prevChangeRot = Quaternion.identity;
@@ -87,7 +89,17 @@ public class CustomCamera : MonoBehaviour {
 			return new Vector2(screen.x, screen.y);
 		}).ToArray();
 
+		// Create an intrinsics matrix.
+		Matrix intrinsics = new Matrix(3, 3);
+		intrinsics[0, 0] = this.focalLength;
+		intrinsics[1, 1] = this.focalLength;
+		intrinsics[0, 2] = this.cameraCenter.x;
+		intrinsics[1, 2] = this.cameraCenter.y;
+		intrinsics[2, 2] = 1;
+
 		Matrix homography = MathSupport.ComputeHomography(screenPoints, points);
+		homography = intrinsics.Inverse() * homography;
+
 		Matrix pose = Matrix.Identity(3, 4);
 
 		// Set the first two columns of the pose.
@@ -104,15 +116,7 @@ public class CustomCamera : MonoBehaviour {
 		float tnorm = (norm1 + norm2) / 2;
 		pose.SetColumnVector(homography.GetColumnVector(2) / tnorm, 3);
 
-		// Create an intrinsics matrix.
-		Matrix intrinsics = new Matrix(3, 3);
-		intrinsics[0, 0] = this.focalLength;
-		intrinsics[1, 1] = this.focalLength;
-		intrinsics[0, 2] = this.cameraCenter.x;
-		intrinsics[1, 2] = this.cameraCenter.y;
-		intrinsics[2, 2] = 1;
-
-		Matrix extrinsics = intrinsics.Inverse() * pose;
+		Matrix extrinsics = pose;
 
 		Matrix camRotation = extrinsics.GetMatrix(0, 2, 0, 2);
 		camRotation.Inverse();
