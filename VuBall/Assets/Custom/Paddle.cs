@@ -1,15 +1,49 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Paddle : MonoBehaviour {
 
 	public Camera followCamera;
 	public float forwardDistance = 100;
-	public float lerpSpeed = 0.05f;
+
+	public int smoothingFrames = 20;
+	private Quaternion smoothedRotation;
+	private Vector3 smoothedPosition;
+
+	private Queue<Quaternion> savedRotations;
+	private Queue<Vector3> savedPositions;
+
+	void Start() {
+		this.savedRotations = new Queue<Quaternion>(smoothingFrames);
+		this.savedPositions = new Queue<Vector3>(smoothingFrames);
+	}
 	
 	void Update () {
-		Vector3 dest = this.followCamera.transform.position + this.followCamera.transform.forward * this.forwardDistance;
-		this.transform.position = Vector3.Lerp(this.transform.position, dest, this.lerpSpeed);
-		this.transform.rotation = Quaternion.Lerp(this.transform.rotation, this.followCamera.transform.rotation, this.lerpSpeed);
+		Vector3 destination = this.followCamera.transform.position + this.followCamera.transform.forward * this.forwardDistance;
+
+		if (savedRotations.Count >= smoothingFrames) {
+			savedRotations.Dequeue();
+			savedPositions.Dequeue();
+		}
+
+		savedRotations.Enqueue(followCamera.transform.rotation);
+		savedPositions.Enqueue(destination);
+
+		Vector4 avgr = Vector4.zero;
+		foreach (Quaternion singleRotation in savedRotations) {
+			Math3d.AverageQuaternion(ref avgr, singleRotation, savedRotations.Peek(), savedRotations.Count);
+		}
+
+		Vector3 avgp = Vector3.zero;
+		foreach (Vector3 singlePosition in savedPositions) {
+			avgp += singlePosition;
+		}
+		avgp /= savedPositions.Count;
+
+		smoothedRotation = new Quaternion(avgr.x, avgr.y, avgr.z, avgr.w);
+		smoothedPosition = avgp;
+		this.transform.position = smoothedPosition;
+		this.transform.rotation = smoothedRotation;
 	}
 }

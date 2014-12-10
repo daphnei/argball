@@ -1,9 +1,11 @@
-﻿// https://gist.github.com/jankolkmeier/8543156;
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
 
+/// <summary>
+/// Additional math functions provided by:
+/// https://gist.github.com/jankolkmeier/8543156;
+/// </summary>
 public class Math3d : MonoBehaviour {
 
 	private static Transform tempChild = null;

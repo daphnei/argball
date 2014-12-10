@@ -1,9 +1,11 @@
-﻿// https://gist.github.com/jankolkmeier/8543156
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// QCAR smoothing filter provided by:
+/// https://gist.github.com/jankolkmeier/8543156;
+/// </summary>
 [RequireComponent(typeof(QCARBehaviour))]
 public class SmoothCamera : MonoBehaviour, ITrackerEventHandler {
 
@@ -43,7 +45,6 @@ public class SmoothCamera : MonoBehaviour, ITrackerEventHandler {
 		smoothedPosition = avgp;
 	}
 
-	// Use this for initialization
 	void Start() {
 		rotations = new Queue<Quaternion>(smoothingFrames);
 		positions = new Queue<Vector3>(smoothingFrames);
@@ -52,7 +53,6 @@ public class SmoothCamera : MonoBehaviour, ITrackerEventHandler {
 
 	}
 
-	// Update is called once per frame
 	void LateUpdate() {
 		transform.rotation = smoothedRotation;
 		transform.position = smoothedPosition;
