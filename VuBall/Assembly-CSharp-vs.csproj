@@ -169,9 +169,9 @@
      <Compile Include="Assets\Custom\Math3d.cs" />
      <Compile Include="Assets\Custom\MathSupport.cs" />
      <Compile Include="Assets\Custom\Paddle.cs" />
+     <Compile Include="Assets\Custom\ReferenceCamera.cs" />
      <Compile Include="Assets\Custom\SmoothCamera.cs" />
      <Compile Include="Assets\Custom\TestMathSupport.cs" />
-     <Compile Include="Assets\Custom\TesterCamera.cs" />
      <Compile Include="Assets\Custom\ThrowBall.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\CloudRecoBehaviour.cs" />
      <Compile Include="Assets\Qualcomm Augmented Reality\Scripts\CylinderTargetBehaviour.cs" />
