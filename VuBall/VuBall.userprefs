@@ -1,19 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Custom\CustomCamera.cs">
-    <Files>
-      <File FileName="Assets\Custom\DebugMarker.cs" Line="9" Column="1" />
-      <File FileName="Assets\Custom\CameraPoint.cs" Line="19" Column="1" />
-      <File FileName="Assets\Custom\MathSupport.cs" Line="52" Column="2" />
-      <File FileName="Assets\Custom\CustomCamera.cs" Line="91" Column="81" />
-      <File FileName="Assets\Custom\IridiumMathLibrary\LinearAlgebra\Matrix.cs" Line="1911" Column="22" />
-      <File FileName="Assets\Custom\ReferenceCamera.cs" Line="26" Column="35" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="C:\Users\grilledcheese\Code\romjam-2014\Growth\Assets\Scripts\Critter\EnemyGenerator.cs" line="173" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
