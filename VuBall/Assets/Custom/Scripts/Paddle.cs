@@ -7,23 +7,23 @@ using System.Collections.Generic;
 /// be hit against.
 /// </summary>
 public class Paddle : MonoBehaviour {
-	//The camera the paddle should follow.
+	// The camera the paddle should follow.
 	public Camera followCamera;
 
-	//Keep the paddle this far back from the camera's current position.
+	// Keep the paddle this far back from the camera's current position.
 	public float forwardDistance = 100;
 
 	// Whether or not to attempt to smooth the paddle's movement.
 	public bool smooth = false;
 
-	//Average the paddle's rotation and position over the cameras
-	//values for the past this many frames.
+	// Average the paddle's rotation and position over the cameras
+	// values for the past this many frames.
 	public int smoothingFrames = 20;
 
 	private Quaternion smoothedRotation;
 	private Vector3 smoothedPosition;
 
-	//Store a history of the past rotations and positions of the camera.
+	// Store a history of the past rotations and positions of the camera.
 	private Queue<Quaternion> savedRotations;
 	private Queue<Vector3> savedPositions;
 
@@ -32,7 +32,12 @@ public class Paddle : MonoBehaviour {
 		this.savedPositions = new Queue<Vector3>(smoothingFrames);
 	}
 	
+	/// <summary>
+	/// Keeps track of the position of the camera over several frames and uses the
+	/// average position for the paddle position.
+	/// </summary>
 	void Update () {
+		// The destination is selected as the region in front of the camera.
 		Vector3 destination = this.followCamera.transform.position + this.followCamera.transform.forward * this.forwardDistance;
 		SmoothCamera smooth = this.followCamera.GetComponent<SmoothCamera>();
 		Quaternion rotation = this.followCamera.transform.rotation;

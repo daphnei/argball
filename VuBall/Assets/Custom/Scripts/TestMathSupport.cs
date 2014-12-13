@@ -10,10 +10,13 @@ using System;
 /// </summary>
 public static class TestMathSupport {
 
+	/// <summary>
+	/// Tests if the homography actually transforms points from one image to the next properly.
+	/// </summary>
 	public static void TestHomography()
 	{
 		Vector2[] first = { new Vector2(0.5f, 0.5f), new Vector2(2f, 14f), new Vector2(19f, 3f), new Vector2(19f, 23f) };
-		Vector2[] second = {new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(1f, 0f), new Vector2(1f, 1f)};
+		Vector2[] second = { new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(1f, 0f), new Vector2(1f, 1f) };
 
 		Matrix result = MathSupport.ComputeHomography(first, second);
 		for (int i = 0; i < 4; i++) {

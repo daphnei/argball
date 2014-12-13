@@ -6,7 +6,8 @@ using MathNet.Numerics.LinearAlgebra;
 
 /// <summary>
 /// Utility methods for computing the homography and generating
-/// a quaternion.
+/// a quaternion. Also contains methods to convert types between
+/// Unity and Math.Net.
 /// </summary>
 public static class MathSupport {
 
