@@ -66,7 +66,7 @@ public class ReferenceCamera : MonoBehaviour {
 		if (this.markers1 != null) {
 			for (int i = 0; i < markers1.Length; i++) {
 				GUI.color = Color.blue;
-				GUI.Label(new Rect(markers1[i].x - 2, markers1[i].y - 2, 40, 40), "O");
+				GUI.Label(new Rect(markers1[i].x - 2, Screen.height - markers1[i].y - 2, 40, 40), "O");
 			}
 		}		
 		if (this.markers2 != null) {

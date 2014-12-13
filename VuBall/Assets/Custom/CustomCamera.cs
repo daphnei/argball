@@ -31,7 +31,7 @@ public class CustomCamera : MonoBehaviour {
 		Vector3 newPosition;
 		Quaternion newRotation;
 		if (CustomCamera.CustomPlacement) {
-			this.PlaceCameraBasedOnHomographyFull(out newPosition, out newRotation);
+			this.PlaceCameraBasedOnHomographyOld(out newPosition, out newRotation);
 		} else {
 			this.PlaceCameraBasedOnCheating(out newPosition, out newRotation);
 		}
@@ -49,24 +49,22 @@ public class CustomCamera : MonoBehaviour {
 			return new Vector2(screen.x, screen.y);
 		}).ToArray();
 
-		homography = MathSupport.ComputeHomography(screenPoints, points);
+		this.homography = MathSupport.ComputeHomography(screenPoints, points);
 		
-		Matrix complete = this.reference.GetTransformFromWorldToOther(homography).ToGenericMatrix().GetMatrix (0, 2, 0, 3);
-		Matrix intrinsics = this.reference.GetCameraIntrinsicsMatrix().ToGenericMatrix().GetMatrix(0, 2, 0, 2);
-
+		Matrix complete = this.reference.GetTransformFromWorldToOther(homography).ToGenericMatrix().GetMatrix(0, 3, 0, 3);
+		Matrix intrinsics = this.reference.GetCameraIntrinsicsMatrix().ToGenericMatrix().GetMatrix(0, 3, 0, 3);
 		Matrix pose = intrinsics.Inverse() * complete;
-	
+		pose = pose.GetMatrix(0, 2, 0, 3);
+
 		Matrix camRotation = pose.GetMatrix(0, 2, 0, 2).Inverse();
 		Matrix camTranslation = -1 * camRotation.Inverse() * pose.GetColumnVector(3).ToColumnMatrix();
 
 		position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
-		rotation = Quaternion.identity; //this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
-
-		position = this.transform.parent.position + pose.ToMatrix4x4 ().MultiplyPoint (new Vector3 (0, 0, 0));
+		rotation = this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
 	}
 
 	/// <summary>
-	/// Places this camera based on the input points from the other camera.
+	/// An alternative camera placing algorithm that does not work well.
 	/// </summary>
 	void PlaceCameraBasedOnHomographyFull(out Vector3 position, out Quaternion rotation) {
 		Vector2[] screenPoints = trackers.Select(obj => {
@@ -81,20 +79,58 @@ public class CustomCamera : MonoBehaviour {
 		
 		Matrix pose = intrinsics.Inverse() * complete;
 		
-		//Matrix camRotation = pose.GetMatrix(0, 2, 0, 2).Inverse();
-		//Matrix camTranslation = -1 * camRotation.Inverse() * pose.GetColumnVector(3).ToColumnMatrix();
+		// Matrix camRotation = pose.GetMatrix(0, 2, 0, 2).Inverse();
+		// Matrix camTranslation = -1 * camRotation.Inverse() * pose.GetColumnVector(3).ToColumnMatrix();
 		
-		//position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
-		rotation = Quaternion.identity; //this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
+		// position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
+		rotation = Quaternion.identity; // this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
+		position = new Vector3(100, 100, 100);
 
-		Vector4 s = pose.ToMatrix4x4().inverse * new Vector4(0,0,0,1);
-		position = this.transform.parent.position + new Vector3 (s.x, s.y, s.z) / s.w;
+		// Vector4 s = pose.ToMatrix4x4().inverse * new Vector4(0,0,0,1);
+		// position = this.transform.parent.position + new Vector3 (s.x, s.y, s.z) / s.w;
 		this.transform.camera.worldToCameraMatrix = pose.ToMatrix4x4();
 	}
 
+	/// <summary>
+	/// Places this camera based on new homography code with pose building.
+	/// </summary>
+	void PlaceCameraBasedOnHomographyWithPoseBuilding(out Vector3 position, out Quaternion rotation) {
+		Vector2[] screenPoints = trackers.Select(obj => {
+			Vector3 screen = this.arCamera.WorldToScreenPoint(obj.transform.position);
+			return new Vector2(screen.x, screen.y);
+		}).ToArray();
+
+		this.homography = MathSupport.ComputeHomography(screenPoints, points);
+
+		Matrix complete = this.reference.GetTransformFromWorldToOther(homography).ToGenericMatrix().GetMatrix(0, 2, 0, 2);
+		Matrix intrinsics = this.reference.GetCameraIntrinsicsMatrix().ToGenericMatrix().GetMatrix(0, 2, 0, 2);
+		Matrix inverseComplete = intrinsics.Inverse() * complete;
+		Matrix pose = Matrix.Identity(3, 4);
+
+		// Set the first two columns of the pose.
+		pose.SetColumnVector(inverseComplete.GetColumnVector(0).Normalize(), 0);
+		pose.SetColumnVector(inverseComplete.GetColumnVector(1).Normalize(), 1);
+
+		// Set the third column as the cross of the first two.
+		Vector cross = pose.GetColumnVector(0).CrossMultiply(pose.GetColumnVector(1)).Normalize();
+		pose.SetColumnVector(cross, 2);
+
+		// Set the forth column of the pose matrix.
+		float norm1 = (float)inverseComplete.GetColumnVector(0).Norm();
+		float norm2 = (float)inverseComplete.GetColumnVector(1).Norm();
+		float tnorm = (norm1 + norm2) / 2;
+		pose.SetColumnVector(inverseComplete.GetColumnVector(2) / tnorm, 3);
+
+		Matrix camRotation = pose.GetMatrix(0, 2, 0, 2).Inverse();
+		Matrix camTranslation = -1 * camRotation.Inverse() * pose.GetColumnVector(3).ToColumnMatrix();
+
+		position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
+		rotation = this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
+	}
 
 	/// <summary>
-	/// Places this camera based on the input points from the other camera.
+	/// A much older camera placement algorithm that tried to use a fixed reference plane
+	/// and camera intrinsics sampled from Matlab.
 	/// </summary>
 	void PlaceCameraBasedOnHomographyOld(out Vector3 position, out Quaternion rotation) {
 		Vector2[] screenPoints = trackers.Select(obj => {
@@ -133,6 +169,7 @@ public class CustomCamera : MonoBehaviour {
 
 		Matrix camRotation = extrinsics.GetMatrix(0, 2, 0, 2);
 		camRotation.Inverse();
+
 		Matrix camTranslation = extrinsics.GetColumnVector(3).ToColumnMatrix();
 		camTranslation = -1 * camRotation * camTranslation;
 
