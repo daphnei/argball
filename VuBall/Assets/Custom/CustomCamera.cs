@@ -166,12 +166,11 @@ public class CustomCamera : MonoBehaviour {
 		pose.SetColumnVector(homography.GetColumnVector(2) / tnorm, 3);
 
 		Matrix extrinsics = pose;
-
 		Matrix camRotation = extrinsics.GetMatrix(0, 2, 0, 2);
 		camRotation.Inverse();
 
 		Matrix camTranslation = extrinsics.GetColumnVector(3).ToColumnMatrix();
-		camTranslation = -1 * camRotation * camTranslation;
+		camTranslation = -1 * camRotation.Inverse() * camTranslation;
 
 		position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
 		rotation = this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);

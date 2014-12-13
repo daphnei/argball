@@ -59,6 +59,9 @@ public class ReferenceCamera : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// The GUI method displays debug information to the user.
+	/// </summary>
 	void OnGUI() {
 		if (!CustomCamera.CustomDebug) {
 			return;
