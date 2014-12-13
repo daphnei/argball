@@ -20,11 +20,6 @@ public class CustomCamera : MonoBehaviour {
 	public GameObject[] trackers;
 	public Vector2[] points;
 
-	// K1: 0.0312817 K2: 0.0554488 K3: 0
-	// P1: 0.00373779 P2: -0.00377362
-	public float focalLength = 4;
-	public Vector2 cameraCenter = new Vector2(0.00373779f, -0.00377362f);
-
 	public Matrix homography = null;
 	public ReferenceCamera reference;
 
@@ -143,12 +138,7 @@ public class CustomCamera : MonoBehaviour {
 		}).ToArray();
 
 		// Create an intrinsics matrix.
-		Matrix intrinsics = new Matrix(3, 3);
-		intrinsics[0, 0] = this.focalLength;
-		intrinsics[1, 1] = this.focalLength;
-		intrinsics[0, 2] = this.cameraCenter.x;
-		intrinsics[1, 2] = this.cameraCenter.y;
-		intrinsics[2, 2] = 1;
+		Matrix intrinsics = getNexus5CameraIntrinsicsMatrix();
 
 		homography = MathSupport.ComputeHomography(screenPoints, points);
 		homography = intrinsics.Inverse() * homography;
@@ -187,5 +177,27 @@ public class CustomCamera : MonoBehaviour {
 	void PlaceCameraBasedOnCheating(out Vector3 position, out Quaternion rotation) {		
 		position = this.arCamera.transform.position;
 		rotation = this.arCamera.transform.rotation;
+	}
+
+	/// <summary>
+	/// Returns the hardcoded calibration for my Nexus 5 phone.
+	/// </summary>
+	/// <returns>A camera calibration matrix.</returns>
+	Matrix getNexus5CameraIntrinsicsMatrix() {
+
+		//Values in pixels, but these make the camera even worse.
+		//Is there a unit mismatch? Should these be values in 
+		//Unity units? Commenting this out for now.
+		/*
+		Matrix intrinsics = new Matrix(3, 3);
+		intrinsics[0, 0] = 3235.21f;
+		intrinsics[1, 1] = 3065.28f;
+		intrinsics[0, 2] = 1578.19f;
+		intrinsics[1, 2] = 1790.96f;
+		intrinsics[2, 2] = 1;
+		 */
+
+		Matrix intrinsics = Matrix.Identity(3, 3);
+		return intrinsics;
 	}
 }
