@@ -129,7 +129,8 @@ public class CustomCamera : MonoBehaviour {
 
 	/// <summary>
 	/// A much older camera placement algorithm that tried to use a fixed reference plane
-	/// and camera intrinsics sampled from Matlab.
+	/// and camera intrinsics sampled from Matlab. This tended to work the best of our different
+	/// experiments.
 	/// </summary>
 	void PlaceCameraBasedOnHomographyOld(out Vector3 position, out Quaternion rotation) {
 		Vector2[] screenPoints = trackers.Select(obj => {
@@ -160,12 +161,11 @@ public class CustomCamera : MonoBehaviour {
 		pose.SetColumnVector(homography.GetColumnVector(2) / tnorm, 3);
 
 		Matrix extrinsics = pose;
-
 		Matrix camRotation = extrinsics.GetMatrix(0, 2, 0, 2);
 		camRotation.Inverse();
 
 		Matrix camTranslation = extrinsics.GetColumnVector(3).ToColumnMatrix();
-		camTranslation = -1 * camRotation * camTranslation;
+		camTranslation = -1 * camRotation.Inverse() * camTranslation;
 
 		position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
 		rotation = this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
@@ -185,9 +185,10 @@ public class CustomCamera : MonoBehaviour {
 	/// <returns>A camera calibration matrix.</returns>
 	Matrix getNexus5CameraIntrinsicsMatrix() {
 
-		//Values in pixels, but these make the camera even worse.
-		//Is there a unit mismatch? Should these be values in 
-		//Unity units? Commenting this out for now.
+		// Values in pixels, but these make the camera even worse.
+		// Is there a unit mismatch? Should these be values in 
+		// Unity units? Commenting this out for now.
+
 		/*
 		Matrix intrinsics = new Matrix(3, 3);
 		intrinsics[0, 0] = 3235.21f;

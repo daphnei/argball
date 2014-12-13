@@ -20,22 +20,26 @@ public class ReferenceCamera : MonoBehaviour {
 	/// Uses the known information about the camera extrinsics and intrinsics to build a
 	/// homography from the world to the other.
 	/// </summary>
-	/// <param name="homographyToMyScreen"></param>
-	/// <returns></returns>
 	public Matrix4x4 GetTransformFromWorldToOther(Matrix homographyToMyScreen) {
 		Matrix4x4 homoInv = homographyToMyScreen.Inverse().ToMatrix4x4();
 		return homoInv * this.GetCameraIntrinsicsMatrix() * this.camera.worldToCameraMatrix;
 	}
 
+	/// <summary>
+	/// Gets an intrinsics matrix from the Unity camera.
+	/// These intrinsics are not true "intrinsics," but rather the perspective matrix
+	/// and the screen matrix multiplied together.
+	/// </summary>
 	public Matrix4x4 GetCameraIntrinsicsMatrix() {
+		// Create a camera to screen matrix.
 		Matrix4x4 projectionToScreen = new Matrix4x4();
 		projectionToScreen.m00 = projectionToScreen.m02 = this.camera.pixelWidth  * 0.5f;
 		projectionToScreen.m11 = projectionToScreen.m12 = this.camera.pixelHeight  * 0.5f;
 		projectionToScreen.m22 = 1f;
 		projectionToScreen.m33 = 1f;
 		Matrix4x4 proj = this.camera.projectionMatrix;
-		//proj.m32 = 0f;
-		//proj.m23 = 0f;
+		// proj.m32 = 0f;
+		// proj.m23 = 0f;
 		return projectionToScreen * proj;
 	}
 	
@@ -59,6 +63,9 @@ public class ReferenceCamera : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// The GUI method displays debug information to the user.
+	/// </summary>
 	void OnGUI() {
 		if (!CustomCamera.CustomDebug) {
 			return;

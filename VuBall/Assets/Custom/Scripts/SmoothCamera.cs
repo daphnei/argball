@@ -5,6 +5,8 @@ using System.Collections.Generic;
 /// <summary>
 /// QCAR smoothing filter provided by:
 /// https://gist.github.com/jankolkmeier/8543156;
+/// It attaches to a event handler on Vuforia which allows us to smooth
+/// the position and rotation of the image.
 /// </summary>
 [RequireComponent(typeof(QCARBehaviour))]
 public class SmoothCamera : MonoBehaviour, ITrackerEventHandler {
