@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
 using System;
+using MathNet.Numerics.LinearAlgebra;
 
 public static class MathSupport {
 
@@ -16,7 +16,7 @@ public static class MathSupport {
 
 	public static Vector3 ToVector3(this Vector vector) {
 		if (vector.Length != 3) {
-			throw new Exception("You suck.");
+			throw new Exception("Invalid vector!");
 		}
 		return new Vector3((float)vector[0], (float)vector[1], (float)vector[2]);
 	}
@@ -24,13 +24,27 @@ public static class MathSupport {
 	public static Matrix4x4 ToMatrix4x4(this Matrix matirx) {
 		Matrix4x4 result = new Matrix4x4();
 		for (int r = 0; r < matirx.RowCount && r < 4; r++) {
-			for (int c = 0; c < matirx.RowCount && c < 4; c++) {
+			for (int c = 0; c < matirx.ColumnCount && c < 4; c++) {
 				result[r, c] = (float)matirx[r, c];
 			}
+		}
+		int min = Mathf.Min (matirx.RowCount, matirx.ColumnCount);
+		for (int i = min; i < 4; i++) {
+			result[i,i] = 1;
 		}
 		return result;
 	}
 
+	public static Matrix ToGenericMatrix(this Matrix4x4 matirx) {
+		Matrix result = new Matrix(4,4);
+		for (int r = 0; r < 4; r++) {
+			for (int c = 0; c < 4; c++) {
+				result[r, c] = matirx[r, c];
+			}
+		}
+		return result;
+	}
+	
 	/// <summary>
 	/// Code adapted from this article:
 	/// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm

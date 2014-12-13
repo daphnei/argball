@@ -5,6 +5,9 @@ public class CameraPoint : MonoBehaviour {
 
 	public Camera attachedCamera;
 
+	/// <summary>
+	/// Show markers to represent the GUI.
+	/// </summary>
 	void OnGUI() {
 		if (CustomCamera.CustomDebug) {
 			Vector3 screenPos = this.attachedCamera.WorldToScreenPoint(this.transform.position);

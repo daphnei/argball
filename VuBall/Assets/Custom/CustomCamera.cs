@@ -16,12 +16,13 @@ public class CustomCamera : MonoBehaviour {
 	public GameObject[] trackers;
 	public Vector2[] points;
 
-	//K1: 0.0312817 K2: 0.0554488 K3: 0
-	//P1: 0.00373779 P2: -0.00377362
+	// K1: 0.0312817 K2: 0.0554488 K3: 0
+	// P1: 0.00373779 P2: -0.00377362
 	public float focalLength = 4;
 	public Vector2 cameraCenter = new Vector2(0.00373779f, -0.00377362f);
 
-	public Matrix homography;
+	public Matrix homography = null;
+	public ReferenceCamera reference;
 
 	// Update is called once per frame
 	void Update () {
@@ -30,7 +31,7 @@ public class CustomCamera : MonoBehaviour {
 		Vector3 newPosition;
 		Quaternion newRotation;
 		if (CustomCamera.CustomPlacement) {
-			this.PlaceCameraBasedOnHomography(out newPosition, out newRotation);
+			this.PlaceCameraBasedOnHomographyFull(out newPosition, out newRotation);
 		} else {
 			this.PlaceCameraBasedOnCheating(out newPosition, out newRotation);
 		}
@@ -43,6 +44,59 @@ public class CustomCamera : MonoBehaviour {
 	/// Places this camera based on the input points from the other camera.
 	/// </summary>
 	void PlaceCameraBasedOnHomography(out Vector3 position, out Quaternion rotation) {
+		Vector2[] screenPoints = trackers.Select(obj => {
+			Vector3 screen = this.arCamera.WorldToScreenPoint(obj.transform.position);
+			return new Vector2(screen.x, screen.y);
+		}).ToArray();
+
+		homography = MathSupport.ComputeHomography(screenPoints, points);
+		
+		Matrix complete = this.reference.GetTransformFromWorldToOther(homography).ToGenericMatrix().GetMatrix (0, 2, 0, 3);
+		Matrix intrinsics = this.reference.GetCameraIntrinsicsMatrix().ToGenericMatrix().GetMatrix(0, 2, 0, 2);
+
+		Matrix pose = intrinsics.Inverse() * complete;
+	
+		Matrix camRotation = pose.GetMatrix(0, 2, 0, 2).Inverse();
+		Matrix camTranslation = -1 * camRotation.Inverse() * pose.GetColumnVector(3).ToColumnMatrix();
+
+		position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
+		rotation = Quaternion.identity; //this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
+
+		position = this.transform.parent.position + pose.ToMatrix4x4 ().MultiplyPoint (new Vector3 (0, 0, 0));
+	}
+
+	/// <summary>
+	/// Places this camera based on the input points from the other camera.
+	/// </summary>
+	void PlaceCameraBasedOnHomographyFull(out Vector3 position, out Quaternion rotation) {
+		Vector2[] screenPoints = trackers.Select(obj => {
+			Vector3 screen = this.arCamera.WorldToScreenPoint(obj.transform.position);
+			return new Vector2(screen.x, screen.y);
+		}).ToArray();
+		
+		homography = MathSupport.ComputeHomography(screenPoints, points);
+		
+		Matrix complete = this.reference.GetTransformFromWorldToOther(homography).ToGenericMatrix().GetMatrix (0, 3, 0, 3);
+		Matrix intrinsics = this.reference.GetCameraIntrinsicsMatrix().ToGenericMatrix().GetMatrix(0, 3, 0, 3);
+		
+		Matrix pose = intrinsics.Inverse() * complete;
+		
+		//Matrix camRotation = pose.GetMatrix(0, 2, 0, 2).Inverse();
+		//Matrix camTranslation = -1 * camRotation.Inverse() * pose.GetColumnVector(3).ToColumnMatrix();
+		
+		//position = this.transform.parent.position + camTranslation.GetColumnVector(0).ToVector3();
+		rotation = Quaternion.identity; //this.transform.parent.rotation * MathSupport.ConvertRotationMatrixToQuaternion(camRotation);
+
+		Vector4 s = pose.ToMatrix4x4().inverse * new Vector4(0,0,0,1);
+		position = this.transform.parent.position + new Vector3 (s.x, s.y, s.z) / s.w;
+		this.transform.camera.worldToCameraMatrix = pose.ToMatrix4x4();
+	}
+
+
+	/// <summary>
+	/// Places this camera based on the input points from the other camera.
+	/// </summary>
+	void PlaceCameraBasedOnHomographyOld(out Vector3 position, out Quaternion rotation) {
 		Vector2[] screenPoints = trackers.Select(obj => {
 			Vector3 screen = this.arCamera.WorldToScreenPoint(obj.transform.position);
 			return new Vector2(screen.x, screen.y);

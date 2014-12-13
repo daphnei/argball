@@ -6,6 +6,11 @@ using OpenCvSharp;
 using System.Runtime.InteropServices;
 using OpenCvSharp.CPlusPlus;
 
+/// <summary>
+/// This class tries to use OpenCV capture instead of the Unity
+/// capture in the hopes that it is faster. From this experiement,
+/// it always performed worse!
+/// </summary>
 public class OpenCVCapture : MonoBehaviour {
 
 	private GameObject planeObject;
@@ -28,26 +33,19 @@ public class OpenCVCapture : MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
-		
 		this.capture = CvCapture.FromCamera(0);
-		//this.vcapture = VideoCapture.FromCamera(0);
 		convertedImage2 = new IplImage(new CvSize(IM_WIDTH, IM_HEIGHT), BitDepth.U8, 3);
 		convertedImage3 = new IplImage(new CvSize(IM_WIDTH, IM_HEIGHT), BitDepth.U8, 1);
 
 		outputTexture = new Texture2D(IM_WIDTH, IM_HEIGHT, TextureFormat.RGB24, false);
 		planeObject = GameObject.Find("Plane");
 		planeObject.renderer.material.mainTexture = outputTexture;
-		
-		//readCapture = new Mat(
 	}
 
 	void Update() {
-		//this.vcapture.Read(readCapture);
-
 		if (this.capture.GrabFrame() != 0) {
 			captureImage2 = this.capture.RetrieveFrame();
 		}
-		//captureImage2 = this.capture.QueryFrame();
 		captureImage2.Resize(convertedImage2);
 		convertedImage2.Canny(convertedImage3, 2, 2);
 		this.IplImageToTexture2D(convertedImage3);
@@ -65,61 +63,7 @@ public class OpenCVCapture : MonoBehaviour {
 				outputTexture.SetPixel(j, displayImg.Height - i - 1, color);
 			}
 		}
-		outputTexture.Apply();
-		
-		//Debug.Log(matrix.ToString());
-		//texImage.LoadImage(matrix.(".png"));
-		//matrix.ToBytes(".png");
-		//Marshal.Copy(, 0, texImage.GetNativeTexturePtr(), 640 * 480 * 4);
-
-		
-
-		//outputTexture.Apply();
-		//planeObject.renderer.material.mainTexture = outputTexture;
-	}
-
-	Color32[] colors = new Color32[640 * 480];
-
-	void Texture2DtoIplImage() {
-		int jBackwards = IM_HEIGHT;
-
-		/*for (int v = 0; v < imHeight; ++v) {
-			for (int u = 0; u < imWidth; ++u) {
-
-				CvScalar col = new CvScalar();
-				col.Val0 = (double)webcamTexture.GetPixel(u, v).b * 255;
-				col.Val1 = (double)webcamTexture.GetPixel(u, v).g * 255;
-				col.Val2 = (double)webcamTexture.GetPixel(u, v).r * 255;
-
-				jBackwards = imHeight - v - 1;
-
-				matrix.Set2D(jBackwards, u, col);
-				matrix.se
-				//matrix [jBackwards, u] = col;
-			}
-		}*/
-
-		this.webcamTexture.GetPixels32(colors);
-		byte[] bytes = Color32ArrayToByteArray(colors); // OPTIMIZE
-		Debug.Log(bytes.Length);
-		Marshal.Copy(bytes, 0, matrix2.ImageData, 640 * 480 * 4);
-
-		/*IntPtr ptr = matrix.ImageData;
-		for (int x = 0; x < imWidth; x++) {
-			for (int y = 0; y < imHeight; y++) {
-				int offset = (image.WidthStep * y) + (x * 3);
-				byte b = Marshal.ReadByte(ptr, offset + 0);    // B
-				byte g = Marshal.ReadByte(ptr, offset + 1);    // G
-				byte r = Marshal.ReadByte(ptr, offset + 2);    // R
-				Marshal.WriteByte(ptr, offset, r);
-				Marshal.WriteByte(ptr, offset, g);
-				Marshal.WriteByte(ptr, offset, b);
-			}
-		}
-
-
-		Marshal.Copy(this.webcamTexture.GetNativeTexturePtr, matrix., 0, 640 * 480 * 3);*/
-		//Cv.SaveImage ("C:\\Hasan.jpg", matrix);
+		this.outputTexture.Apply();
 	}
 
 	private static byte[] Color32ArrayToByteArray(Color32[] colors) {
