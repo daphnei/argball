@@ -2,8 +2,8 @@
 using System.Collections;
 using System;
 
-/// <summary>
-/// Additional math functions provided by:
+///<summary>
+/// Some handy math utilities we found at:
 /// https://gist.github.com/jankolkmeier/8543156;
 /// </summary>
 public class Math3d : MonoBehaviour {

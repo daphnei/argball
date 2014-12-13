@@ -4,6 +4,10 @@ using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using System;
 
+/// <summary>
+/// Output a sample homography calculation to make sure our result
+/// is sensible. This was just used for testing.
+/// </summary>
 public static class TestMathSupport {
 
 	public static void TestHomography()

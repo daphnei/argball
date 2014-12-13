@@ -4,6 +4,9 @@ using System.Collections;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 
+/// <summary>
+/// When the user clicks ont he green, through the ball out from the paddle.
+/// </summary>
 public class ThrowBall : MonoBehaviour {
 
 	public Camera throwCamera;

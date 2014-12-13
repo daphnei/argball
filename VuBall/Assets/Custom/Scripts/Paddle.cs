@@ -2,18 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// The paddle that follows the camera and the ball is meant to
+/// be hit against.
+/// </summary>
 public class Paddle : MonoBehaviour {
-
+	//The camera the paddle should follow.
 	public Camera followCamera;
+
+	//Keep the paddle this far back from the camera's current position.
 	public float forwardDistance = 100;
 
-	public int smoothingFrames = 20;
-
+	// Whether or not to attempt to smooth the paddle's movement.
 	public bool smooth = false;
+
+	//Average the paddle's rotation and position over the cameras
+	//values for the past this many frames.
+	public int smoothingFrames = 20;
 
 	private Quaternion smoothedRotation;
 	private Vector3 smoothedPosition;
 
+	//Store a history of the past rotations and positions of the camera.
 	private Queue<Quaternion> savedRotations;
 	private Queue<Vector3> savedPositions;
 

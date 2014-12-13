@@ -4,6 +4,10 @@ using MathNet.Numerics;
 using System;
 using MathNet.Numerics.LinearAlgebra;
 
+/// <summary>
+/// Utility methods for computing the homography and generating
+/// a quaternion.
+/// </summary>
 public static class MathSupport {
 
 	public static Vector ToHomogeneousVector(this Vector2 vector) {

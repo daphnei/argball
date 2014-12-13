@@ -6,7 +6,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
-
+/// <summary>
+/// The camera that we implemented. If our math was correct, this
+/// camera should have have the same position and rotation as the
+/// Vuforia camera.
+/// </summary>
 public class CustomCamera : MonoBehaviour {
 
 	public static bool CustomPlacement = true;

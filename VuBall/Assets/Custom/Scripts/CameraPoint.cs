@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <Summary>
+/// Represents one of the four corners of the reference image within the current
+/// frame, as it is detected by Vuforia. If the debug flag is on, this corner
+/// is visualized by a red dot.
+/// </Summary>
 public class CameraPoint : MonoBehaviour {
 
 	public Camera attachedCamera;
